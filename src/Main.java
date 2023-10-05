@@ -1,3 +1,13 @@
+//create database aulaJava;
+//        use aulaJava
+//
+//        create table usuario(
+//        id int primary key not null,
+//        nome varchar(50) not null,
+//        senha varchar(50) not null,
+//        idade int
+//        );
+
 import com.mysql.cj.jdbc.JdbcConnection;
 
 import java.sql.*;
