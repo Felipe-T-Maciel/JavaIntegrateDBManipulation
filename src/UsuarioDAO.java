@@ -1,12 +1,15 @@
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
 
 public class UsuarioDAO extends DAOPadrao<Usuario, Integer>{
 
 
-    public UsuarioDAO(Connection connection) {
-        super(connection);
+    public UsuarioDAO() throws SQLException {
+        super("usuario");
+    }
+
+    @Override
+    public Usuario converter(ResultSet rs) throws SQLException {
+        return new Usuario(rs);
     }
 
     @Override
@@ -29,33 +32,6 @@ public class UsuarioDAO extends DAOPadrao<Usuario, Integer>{
 
     }
 
-    @Override
-    public Usuario buscarUm(Connection connection, Integer integer) {
-        try (PreparedStatement statement = connection.prepareStatement("select * from usuario where id=?")){
-            statement.setInt(1,integer);
-            ResultSet rs = statement.executeQuery();
-            rs.next();
-            return new Usuario(rs);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return null;
-    }
-
-
-    @Override
-    public Set<Usuario> buscarTodos(Connection connection) {
-        Set<Usuario> listaUsuarios = new HashSet<>();
-        try (PreparedStatement statement = connection.prepareStatement("select * from usuario;")){
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()){
-                listaUsuarios.add(new Usuario(rs));
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return listaUsuarios;
-    }
 
     @Override
     public void atualizar(Connection connection, Usuario obj) {
@@ -75,15 +51,5 @@ public class UsuarioDAO extends DAOPadrao<Usuario, Integer>{
             throwables.printStackTrace();
         }
 
-    }
-
-    @Override
-    public void deletar(Connection connection, Integer integer) {
-        try (PreparedStatement statement = connection.prepareStatement("delete from usuario where id=?;")){
-            statement.setInt(1,integer);
-            statement.execute();
-        }catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
     }
 }

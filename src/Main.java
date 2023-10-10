@@ -1,12 +1,3 @@
-//create database aulaJava;
-//        use aulaJava
-//
-//        create table usuario(
-//        id int primary key not null,
-//        nome varchar(50) not null,
-//        senha varchar(50) not null,
-//        idade int
-//        );
 import java.sql.*;
 import java.util.*;
 
@@ -15,14 +6,10 @@ public class Main {
     static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args){
-        String urlBanco = "jdbc:mysql://localhost:3306/aulajava";
-        String usuarioBD = "root";
-        String senhaBD = "root";
 
-        try (Connection connection = DriverManager.getConnection(urlBanco, usuarioBD,senhaBD)){
-
-            UsuarioDAO usuarioDAO = new UsuarioDAO(connection);
-            CarroDAO carroDAO = new CarroDAO(connection);
+        try (Connection connection = Banco.conectar()){
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            CarroDAO carroDAO = new CarroDAO();
 
             do{
                 System.out.print("""
@@ -42,7 +29,6 @@ public class Main {
                     }
                     case 3->{
                         System.out.println("Fechando servidor...");
-                        connection.close();
                         System.exit(0);
                     }
                 }
