@@ -2,8 +2,12 @@ import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UsuarioDAO implements ICRUD<Usuario, Integer>{
+public class UsuarioDAO extends DAOPadrao<Usuario, Integer>{
 
+
+    public UsuarioDAO(Connection connection) {
+        super(connection);
+    }
 
     @Override
     public void inserir(Connection connection, Usuario user) {
@@ -31,12 +35,7 @@ public class UsuarioDAO implements ICRUD<Usuario, Integer>{
             statement.setInt(1,integer);
             ResultSet rs = statement.executeQuery();
             rs.next();
-            for (Usuario user:
-                 buscarTodos(connection)) {
-                if(rs.getInt("id") == user.getId()){
-                    return user;
-                }
-            }
+            return new Usuario(rs);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -50,12 +49,7 @@ public class UsuarioDAO implements ICRUD<Usuario, Integer>{
         try (PreparedStatement statement = connection.prepareStatement("select * from usuario;")){
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                listaUsuarios.add(new Usuario(
-                        rs.getInt("id"),
-                        rs.getString("nome"),
-                        rs.getString("senha"),
-                        rs.getInt("idade")
-                ));
+                listaUsuarios.add(new Usuario(rs));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();

@@ -1,3 +1,6 @@
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Usuario {
     private Integer id;
     private String nome;
@@ -10,6 +13,15 @@ public class Usuario {
         this.nome = nome;
         this.senha = senha;
         this.idade = idade;
+    }
+
+    public Usuario(ResultSet rs) throws SQLException {
+        this.id = rs.getInt("id");
+        this.nome = rs.getString("nome");
+        this.senha = rs.getString("senha");
+        if(rs.getInt("id_carro")!=0){
+            this.carro = new Carro(rs.getInt("id_carro"));
+        }
     }
 
     public void setCarro(Carro carro) {

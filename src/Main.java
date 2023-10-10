@@ -13,14 +13,17 @@ import java.util.*;
 public class Main {
 
     static Scanner sc = new Scanner(System.in);
-    static UsuarioDAO usuarioDAO = new UsuarioDAO();
-    static CarroDAO carroDAO = new CarroDAO();
 
-    public void main(String[] args){
+    public static void main(String[] args){
         String urlBanco = "jdbc:mysql://localhost:3306/aulajava";
         String usuarioBD = "root";
         String senhaBD = "root";
+
         try (Connection connection = DriverManager.getConnection(urlBanco, usuarioBD,senhaBD)){
+
+            UsuarioDAO usuarioDAO = new UsuarioDAO(connection);
+            CarroDAO carroDAO = new CarroDAO(connection);
+
             do{
                 System.out.print("""
                         --- Menu ---
@@ -32,10 +35,10 @@ public class Main {
                 int opcao = sc.nextInt();
                 switch (opcao){
                     case 1->{
-                        menuUsuario(connection);
+                        menuUsuario(connection, usuarioDAO, carroDAO);
                     }
                     case 2->{
-                        menuCarro(connection);
+                        menuCarro(connection, carroDAO);
                     }
                     case 3->{
                         System.out.println("Fechando servidor...");
@@ -49,7 +52,8 @@ public class Main {
         }
     }
 
-    private static void menuCarro(Connection connection) {
+
+    private static void menuCarro(Connection connection, CarroDAO carroDAO) {
         do{
             System.out.print("""
                 --- Bem vindo ao CarroBD ---
@@ -77,13 +81,13 @@ public class Main {
                     }
                 }
                 case 3 -> {
-                    System.out.println(carroDAO.buscarUm(connection,procuraIdCar(connection)));
+                    System.out.println(carroDAO.buscarUm(connection,procuraIdCar(connection, carroDAO)));
                 }
                 case 4 -> {
-                    carroDAO.atualizar(connection,editarCarro(procuraIdCar(connection)));
+                    carroDAO.atualizar(connection,editarCarro(procuraIdCar(connection, carroDAO)));
                 }
                 case 5 -> {
-                    carroDAO.deletar(connection, procuraIdCar(connection));
+                    carroDAO.deletar(connection, procuraIdCar(connection,carroDAO));
                 }
                 case 6->{
                     return;
@@ -112,7 +116,7 @@ public class Main {
         return null;
     }
 
-    private void menuUsuario(Connection connection) {
+    private static void menuUsuario(Connection connection, UsuarioDAO usuarioDAO, CarroDAO carroDAO) {
         do{
             System.out.print("""
                 --- Bem vindo ao UserBD ---
@@ -122,13 +126,14 @@ public class Main {
                 [3] Buscar um especifico
                 [4] Editar um usuario
                 [5] Deletar um usuario
-                [6] Voltar
+                [6] Linkar um carro ao usuario
+                [7] Voltar
                 
                 >\t""");
             int escolha = sc.nextInt();
             switch (escolha){
                 case 1 -> {
-                    Usuario usuario = criarUser(connection);
+                    Usuario usuario = criarUser(connection, carroDAO);
                     usuarioDAO.inserir(connection,usuario);
                     System.out.println("Voce foi cadastrado no sistema e seu id é: "+usuario.getId()+" divirta-se!");
                 }
@@ -143,15 +148,18 @@ public class Main {
                     }
                 }
                 case 3 -> {
-                    System.out.println(usuarioDAO.buscarUm(connection,procuraIduser(connection)));
+                    System.out.println(usuarioDAO.buscarUm(connection,procuraIduser(connection, usuarioDAO)));
                 }
                 case 4 -> {
-                    usuarioDAO.atualizar(connection,editarUser(procuraIduser(connection)));
+                    usuarioDAO.atualizar(connection,editarUser(procuraIduser(connection, usuarioDAO)));
                 }
                 case 5 -> {
-                    usuarioDAO.deletar(connection, procuraIduser(connection));
+                    usuarioDAO.deletar(connection, procuraIduser(connection, usuarioDAO));
                 }
-                case 6->{
+                case 6 -> {
+
+                }
+                case 7->{
                     return;
                 }
             }
@@ -180,7 +188,7 @@ public class Main {
         return new Carro(id,marca,modelo,ano,preco);
     }
 
-    private static int procuraIduser(Connection connection) {
+    private static int procuraIduser(Connection connection, UsuarioDAO usuarioDAO) {
         int escolhaId = 0;
         do{
             System.out.print("[0] Para cancelar pesquisa" +
@@ -197,7 +205,7 @@ public class Main {
         }while(true);
     }
 
-    private static int procuraIdCar(Connection connection) {
+    private static int procuraIdCar(Connection connection, CarroDAO carroDAO) {
         int escolhaId = 0;
         do{
             System.out.print("[0] Para cancelar pesquisa" +
@@ -215,7 +223,7 @@ public class Main {
     }
 
 
-    private static Usuario criarUser(Connection connection) {
+    private static Usuario criarUser(Connection connection, CarroDAO carroDAO) {
             System.out.print("Nome: ");
             String nome = sc.next();
             System.out.print("Senha: ");

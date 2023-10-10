@@ -2,7 +2,11 @@ import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CarroDAO implements ICRUD<Carro, Integer>{
+public class CarroDAO extends DAOPadrao<Carro, Integer>{
+
+    public CarroDAO(Connection connection) {
+        super(connection);
+    }
 
     @Override
     public void inserir(Connection connection, Carro car) {
@@ -25,12 +29,7 @@ public class CarroDAO implements ICRUD<Carro, Integer>{
             statement.setInt(1,integer);
             ResultSet rs = statement.executeQuery();
             rs.next();
-            for (Carro carro:
-                    buscarTodos(connection)) {
-                if(rs.getInt("id") == carro.getId()){
-                    return carro;
-                }
-            }
+            return new Carro(rs);
         } catch (SQLException | NullPointerException e) {
             System.err.println(e.getMessage());
         }
@@ -44,18 +43,13 @@ public class CarroDAO implements ICRUD<Carro, Integer>{
         try (PreparedStatement statement = connection.prepareStatement("select * from carro;")){
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                listaCarros.add(new Carro(
-                        rs.getInt("id"),
-                        rs.getString("marca"),
-                        rs.getString("modelo"),
-                        rs.getInt("ano"),
-                        rs.getDouble("preco")
-                ));
+                listaCarros.add(new Carro(rs));
             }
+            return listaCarros;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return listaCarros;
+        throw new RuntimeException();
     }
 
     @Override
